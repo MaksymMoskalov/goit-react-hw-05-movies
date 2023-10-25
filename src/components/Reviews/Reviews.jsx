@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getMovieReviews } from 'service/moviesAPI';
 
-export const Reviews = ({ movieId }) => {
+const Reviews = ({ movieId }) => {
   const [reviews, setReviews] = useState(null);
-  const [errror, setError] = useState(null);
-  const BASE_IMG_URL = 'https://image.tmdb.org/t/p/w200';
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!movieId) return;
@@ -27,7 +26,7 @@ export const Reviews = ({ movieId }) => {
             return (
               <li key={id}>
                 <p>
-                  <span>Author: </span>
+                  <span className="bold">Author: </span>
                   {author}
                 </p>
                 <p>{content}</p>
@@ -35,6 +34,9 @@ export const Reviews = ({ movieId }) => {
             );
           })}
       </ul>
+      {error && window.alert(error)}
     </div>
   );
 };
+
+export default Reviews;

@@ -1,14 +1,25 @@
-import { Cast } from 'components/Cast/Cast';
-import { Reviews } from 'components/Reviews/Reviews';
-import { useEffect, useState } from 'react';
-import { NavLink, useParams, Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import {
+  NavLink,
+  useParams,
+  Route,
+  Routes,
+  Link,
+  useLocation,
+} from 'react-router-dom';
 import { getMovieDetails } from 'service/moviesAPI';
+import { Blocks } from 'react-loader-spinner';
 
-export const MovieInfo = () => {
+const Cast = lazy(() => import('components/Cast/Cast'));
+const Reviews = lazy(() => import('components/Reviews/Reviews'));
+
+const MovieInfo = () => {
   const [movie, setMovie] = useState(null);
-  const [errror, setError] = useState(null);
+  const [error, setError] = useState(null);
   const { movieId } = useParams();
   const BASE_IMG_URL = 'https://image.tmdb.org/t/p/w200';
+  const location = useLocation();
+  const backLinkHref = useRef(location.state?.from ?? '/');
 
   useEffect(() => {
     if (!movieId) return;
@@ -25,32 +36,60 @@ export const MovieInfo = () => {
 
   return (
     <section>
+      <Link to={backLinkHref.current} className="back-btn">
+        Go back
+      </Link>
       {movie !== null && (
-        <div>
-          <img src={BASE_IMG_URL + movie.poster_path} alt="" />
-          <h1>{movie.original_title}</h1>
-          <span>Overview</span>
-          <p>{movie.overview}</p>
-          <span>Genres:</span>
-          <p>
-            {movie.genres
-              .map(({ name }) => {
-                return `${name}`;
-              })
-              .join(' ')}
-          </p>
+        <div className="movie-info-cover">
+          <img
+            src={BASE_IMG_URL + movie.poster_path}
+            alt=""
+            className="poster-image"
+          />
+          <div>
+            <h1>{movie.original_title}</h1>
+            <span className="bold">Overview</span>
+            <p>{movie.overview}</p>
+            <span className="bold">Genres:</span>
+            <p>
+              {movie.genres
+                .map(({ name }) => {
+                  return `${name}`;
+                })
+                .join(', ')}
+            </p>
+          </div>
         </div>
       )}
 
       <div>
-        <NavLink to={'cast'}>Cast</NavLink>
-        <NavLink to={'reviews'}>Reviews</NavLink>
+        <NavLink to={'cast'} className="details-link">
+          Cast
+        </NavLink>
+        <NavLink to={'reviews'} className="details-link">
+          Reviews
+        </NavLink>
       </div>
 
-      <Routes>
-        <Route path="cast" element={<Cast movieId={movieId} />} />
-        <Route path="reviews" element={<Reviews movieId={movieId} />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <Blocks
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="blocks-loading"
+          />
+        }
+      >
+        <Routes>
+          <Route path="cast" element={<Cast movieId={movieId} />} />
+          <Route path="reviews" element={<Reviews movieId={movieId} />} />
+        </Routes>
+      </Suspense>
+
+      {error && window.alert(error)}
     </section>
   );
 };
+
+export default MovieInfo;

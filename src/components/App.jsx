@@ -1,23 +1,40 @@
 import { NavLink, Route, Routes } from 'react-router-dom';
-import { Home } from 'pages/Home';
-import { Search } from 'pages/Search';
-import { MovieInfo } from 'pages/MovieInfo';
+import { StyledContainer } from 'Styles/Container.styled';
+import { Suspense, lazy } from 'react';
+import { Blocks } from 'react-loader-spinner';
+const Home = lazy(() => import('pages/Home'));
+const MovieInfo = lazy(() => import('pages/MovieInfo'));
+const Search = lazy(() => import('pages/Search'));
 
 export const App = () => {
   return (
-    <>
-      <header>
+    <StyledContainer>
+      <header className="header">
         <nav>
-          <NavLink to={'/'}>Home</NavLink>
-          <NavLink to={'/movies'}>Movies</NavLink>
+          <NavLink to={'/'} className="header-link">
+            Home
+          </NavLink>
+          <NavLink to={'/movies'} className="header-link">
+            Movies
+          </NavLink>
         </nav>
       </header>
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<Search />} />
-        <Route path="/movies/:movieId/*" element={<MovieInfo />} />
-      </Routes>
-    </>
+      <Suspense
+        fallback={
+          <Blocks
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="blocks-loading"
+          />
+        }
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/movies" element={<Search />} />
+          <Route path="/movies/:movieId/*" element={<MovieInfo />} />
+        </Routes>
+      </Suspense>
+    </StyledContainer>
   );
 };

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getTrendMovies } from 'service/moviesAPI';
 
-export const Home = () => {
+const Home = () => {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const renderHome = async () => {
@@ -24,7 +25,11 @@ export const Home = () => {
       {movies.map(({ id, original_title }) => {
         return (
           <li key={id}>
-            <Link to={`/movies/${id}`}>
+            <Link
+              state={{ from: location }}
+              to={`/movies/${id}`}
+              className="movie-title"
+            >
               <p>{original_title}</p>
             </Link>
           </li>
@@ -33,3 +38,5 @@ export const Home = () => {
     </ul>
   );
 };
+
+export default Home;

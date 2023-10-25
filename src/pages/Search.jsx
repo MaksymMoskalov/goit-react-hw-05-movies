@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { getMovieByKeyWord } from 'service/moviesAPI';
 
-export const Search = () => {
+const Search = () => {
   const [movies, setMovies] = useState(null);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('query');
-
+  const location = useLocation();
   useEffect(() => {
     if (!query) return;
 
@@ -46,7 +46,11 @@ export const Search = () => {
             movies.map(({ id, original_title }) => {
               return (
                 <li key={id}>
-                  <Link to={`/movies/${id}`}>
+                  <Link
+                    state={{ from: location }}
+                    to={`/movies/${id}`}
+                    className="movie-title"
+                  >
                     <p>{original_title}</p>
                   </Link>
                 </li>
@@ -54,6 +58,9 @@ export const Search = () => {
             })}
         </ul>
       </section>
+      {error && window.alert(error)}
     </div>
   );
 };
+
+export default Search;
